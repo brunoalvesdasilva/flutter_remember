@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return FloatingActionButton(
-      tooltip: 'Increment Counter',
+      tooltip: 'Adicionar nova conta',
       child: const Icon(Icons.add),
       onPressed: () {
         Navigator.push(
