@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-class config extends StatefulWidget {
-  const config({Key? key}) : super(key: key);
+class Config extends StatefulWidget {
+  const Config({Key? key}) : super(key: key);
 
   @override
-  _configState createState() => _configState();
+  _ConfigState createState() => _ConfigState();
 }
 
-class _configState extends State<config> {
+class _ConfigState extends State<Config> {
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text("Config"),
     );
   }

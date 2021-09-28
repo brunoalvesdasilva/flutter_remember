@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'screens/home/home.dart';
+import './screens/home/home.dart';
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     title: 'Meus lembretes de contas',
-    home: Home()
+    home: HomeScreen()
   ));
 }
