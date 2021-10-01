@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../bills_payments/bills_payments.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_lembrete/repository/bill.dart';
+import 'package:flutter_lembrete/screens/bills_payments/bills_payments.dart';
+
+final BillRepository repository = BillRepository();
 
 class BillsPayments extends StatefulWidget {
   const BillsPayments({Key? key}) : super(key: key);
@@ -44,35 +48,33 @@ void gotoEdit(BuildContext context) {
 }
 
 class _BillsPaymentsState extends State<BillsPayments> {
-  final List<Item> _bills = [
-    Item(title: 'Conta de aluguel', isPaid: true),
-    Item(title: 'Conta de luz'),
-    Item(title: 'Conta de escola', isPaid: true),
-    Item(title: 'Conta de gás'),
-    Item(title: 'Conta de internet'),
-    Item(title: 'Conta de celular TIM', isPaid: true),
-    Item(title: 'Conta de internet'),
-    Item(title: 'Conta de internet'),
-    Item(title: 'Conta de internet'),
-    Item(title: 'Conta de internet'),
-    Item(title: 'Conta de internet'),
-    Item(title: 'Conta de internet'),
-    Item(title: 'Conta de internet'),
-    Item(title: 'Conta de internet'),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Container(
-        child: _buildPanel(),
+        child: StreamBuilder(
+          stream: repository.getStream(),
+          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (!snapshot.hasData) return LinearProgressIndicator();
+
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Text("Loading");
+            }
+
+            List<Item> _bills = snapshot.data!.docs.map( (DocumentSnapshot document) {
+              Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+
+              return Item(title: data['title']);
+            }).toList();
+
+            return _buildListBills(_bills);
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildPanel() {
-    // _bills.sort(_sortingBills);
-
+  Widget _buildListBills(List<Item> _bills) {
     return ExpansionPanelList(
       expansionCallback: (int index, bool isExpanded) {
         setState(() {

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_lembrete/dto/bill.dart';
+import 'package:flutter_lembrete/repository/bill.dart';
+
+final BillRepository repository = BillRepository();
 
 class FormBills extends StatefulWidget {
   const FormBills({Key? key}) : super(key: key);
@@ -21,10 +25,15 @@ class _FormBillsState extends State<FormBills> {
       return;
     }
 
-    // ignore: avoid_print
-    print(_inputName.text);
-    print(_inputValue.text);
-    print(_inputExpiration.text);
+    String title =  _inputName.text;
+    double price = 12.0;
+    int expire = int.parse(_inputExpiration.text);
+
+    Bill newBill = Bill(title: title, price: price, expire: expire);
+
+    repository.add(newBill);
+
+    Navigator.pop(context);
   }
 
   @override

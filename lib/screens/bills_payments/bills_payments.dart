@@ -17,7 +17,7 @@ class _BillPaymentsScreenState extends State<BillPaymentsScreen> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: FormBills(),
+      body: const FormBills(),
     );
   }
 }
