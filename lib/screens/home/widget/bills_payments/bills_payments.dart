@@ -5,24 +5,24 @@ import 'package:flutter_lembrete/screens/bills_payments/bills_payments.dart';
 
 final BillRepository repository = BillRepository();
 
-class BillsPayments extends StatefulWidget {
-  const BillsPayments({Key? key}) : super(key: key);
-
-  @override
-  _BillsPaymentsState createState() => _BillsPaymentsState();
-}
-
 class Item {
   Item(
       {required this.title,
-      this.body = "",
-      this.isExpanded = false,
-      this.isPaid = false});
+        this.body = "",
+        this.isExpanded = false,
+        this.isPaid = false});
 
   String title;
   String body;
   bool isExpanded;
   bool isPaid;
+}
+
+class BillsPayments extends StatefulWidget {
+  const BillsPayments({Key? key}) : super(key: key);
+
+  @override
+  _BillsPaymentsState createState() => _BillsPaymentsState();
 }
 
 Color _colorByPaid(bool isPaid) {
@@ -64,17 +64,35 @@ class _BillsPaymentsState extends State<BillsPayments> {
             List<Item> _bills = snapshot.data!.docs.map( (DocumentSnapshot document) {
               Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
 
-              return Item(title: data['title']);
+              return Item(title: data['title'], isPaid: data['isPaid']);
             }).toList();
 
-            return _buildListBills(_bills);
+            _bills.sort(_sortingBills);
+
+            return ListBill(_bills);
           },
         ),
       ),
     );
   }
+}
 
-  Widget _buildListBills(List<Item> _bills) {
+
+class ListBill extends StatefulWidget {
+  List<Item> _bills;
+
+  ListBill(this._bills, {Key? key}) : super(key: key);
+
+  @override
+  _ListBillState createState() => _ListBillState(_bills);
+}
+
+class _ListBillState extends State<ListBill> {
+  final List<Item> _bills;
+  _ListBillState(this._bills);
+
+  @override
+  Widget build(BuildContext context) {
     return ExpansionPanelList(
       expansionCallback: (int index, bool isExpanded) {
         setState(() {
@@ -94,7 +112,7 @@ class _BillsPaymentsState extends State<BillsPayments> {
           body: ListTile(
               title: Text(item.title),
               subtitle:
-                  const Text('To delete this panel, tap the trash can icon'),
+              const Text('To delete this panel, tap the trash can icon'),
               trailing: const Icon(Icons.edit),
               onTap: () {
                 gotoEdit(context);
@@ -102,6 +120,6 @@ class _BillsPaymentsState extends State<BillsPayments> {
           isExpanded: item.isExpanded,
         );
       }).toList(),
-    );
+    );;
   }
 }
