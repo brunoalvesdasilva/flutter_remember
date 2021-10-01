@@ -1,39 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_lembrete/dto/bill.dart';
-import 'package:flutter_lembrete/repository/bill.dart';
+import 'package:flutter_lembrete/bill/dto/bill.dart';
 
-final BillRepository repository = BillRepository();
+class FormBill extends StatefulWidget {
+  final Function onSave;
 
-class FormBills extends StatefulWidget {
-  const FormBills({Key? key}) : super(key: key);
+  const FormBill(this.onSave, {Key? key}) : super(key: key);
 
   @override
-  _FormBillsState createState() => _FormBillsState();
+  _FormBillState createState() => _FormBillState(this.onSave);
 }
 
-class _FormBillsState extends State<FormBills> {
+class _FormBillState extends State<FormBill> {
+  Function onSave;
+
   static const double _spaceInputs = 20;
 
-  TextEditingController _inputName = TextEditingController();
-  TextEditingController _inputValue = TextEditingController();
-  TextEditingController _inputExpiration = TextEditingController();
+  TextEditingController _title = TextEditingController();
+  TextEditingController _price = TextEditingController();
+  TextEditingController _expire = TextEditingController();
 
   final GlobalKey<FormState> _keyForm = GlobalKey<FormState>();
 
-  void saveItem() {
+  _FormBillState(this.onSave);
+
+  double toDouble(String raw) {
+    String text = raw.replaceAll(',', '.');
+    return double.parse(text);
+  }
+
+  void save() {
     if (!_keyForm.currentState!.validate()) {
       return;
     }
 
-    String title =  _inputName.text;
-    double price = 12.0;
-    int expire = int.parse(_inputExpiration.text);
+    String title = _title.text;
+    double price = toDouble(_price.text);
+    int expire = int.parse(_expire.text);
 
-    Bill newBill = Bill(title: title, price: price, expire: expire);
+    BillDTO bill = BillDTO(title, price, expire);
 
-    repository.add(newBill);
-
-    Navigator.pop(context);
+    onSave(bill);
   }
 
   @override
@@ -50,7 +56,7 @@ class _FormBillsState extends State<FormBills> {
               Padding(
                 padding: const EdgeInsets.only(bottom: _spaceInputs),
                 child: TextFormField(
-                  controller: _inputName,
+                  controller: _title,
                   decoration: const InputDecoration(
                     hintText: 'Conta de luz, conta de água, gás',
                   ),
@@ -65,15 +71,16 @@ class _FormBillsState extends State<FormBills> {
               Padding(
                 padding: const EdgeInsets.only(bottom: _spaceInputs),
                 child: TextFormField(
-                  controller: _inputValue,
+                  controller: _price,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     hintText: '0,00',
                   ),
                   validator: (text) {
                     try {
-                      double value = double.parse(text!);
-                      if (! (value >= 0.01)) {
+                      double value = toDouble(text!);
+
+                      if (!(value >= 0.01)) {
                         return 'Digite um valor maior que zero!';
                       }
                     } catch (e) {
@@ -86,7 +93,7 @@ class _FormBillsState extends State<FormBills> {
               Padding(
                 padding: const EdgeInsets.only(bottom: _spaceInputs),
                 child: TextFormField(
-                  controller: _inputExpiration,
+                  controller: _expire,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     hintText: 'De 1 a 31',
@@ -94,7 +101,7 @@ class _FormBillsState extends State<FormBills> {
                   validator: (text) {
                     try {
                       int value = int.parse(text!);
-                      if (! (value >= 1 && value <= 31)) {
+                      if (!(value >= 1 && value <= 31)) {
                         return 'Digite um valor entre 1 e 31';
                       }
                     } catch (e) {
@@ -104,7 +111,7 @@ class _FormBillsState extends State<FormBills> {
                 ),
               ),
               ElevatedButton(
-                onPressed: saveItem,
+                onPressed: save,
                 child: const Text('Salvar lembrete de conta'),
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../bills_payments/bills_payments.dart';
-import './widget/bills_payments/bills_payments.dart';
-import './widget/config/config.dart';
+import 'tab_bills.dart';
+import 'tab_config.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -22,10 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
       tooltip: 'Adicionar nova conta',
       child: const Icon(Icons.add),
       onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const BillPaymentsScreen()),
-        );
+        Navigator.pushNamed(context, '/bill');
       },
     );
   }
@@ -56,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         body: const TabBarView(
           children: <Widget>[
-            BillsPayments(),
+            Bills(),
             Config(),
           ],
         ),
