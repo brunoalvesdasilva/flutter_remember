@@ -11,6 +11,7 @@ cd ios
 
 # run pod install
 rm Podfile.lock
+pod deintegrate
 pod install --repo-update
 
 cd ../
