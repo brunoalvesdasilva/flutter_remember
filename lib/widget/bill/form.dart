@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_lembrete/bill/dto/bill.dart';
+import 'package:flutter_lembrete/bill/model/bill.dart';
 
 class FormBill extends StatefulWidget {
   final Function onSave;
@@ -37,7 +37,7 @@ class _FormBillState extends State<FormBill> {
     double price = toDouble(_price.text);
     int expire = int.parse(_expire.text);
 
-    BillDTO bill = BillDTO(title, price, expire);
+    BillModel bill = BillModel(title, price, expire);
 
     onSave(bill);
   }

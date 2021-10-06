@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_lembrete/bill/dto/bill.dart';
+import 'package:flutter_lembrete/bill/model/bill.dart';
 import 'package:flutter_lembrete/bill/repository.dart';
 import 'package:flutter_lembrete/widget/bill/form.dart';
 
@@ -16,9 +16,9 @@ class BillScreen extends StatefulWidget {
 
 class _BillScreenState extends State<BillScreen> {
 
-  void onSave(BillDTO bill) {
+  void onSave(BillModel bill) {
     repository.add(bill);
-    Navigator.pushNamed(context, '/');
+    Navigator.pop(context);
   }
 
   @override
