@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="br.com.sistemasamo.flutter_lembrete">
+    package="br.com.sistemasamo.lembretes">
    <application
-        android:label="flutter_lembrete"
+        android:name="androidx.multidex.MultiDexApplication"
+        android:label="Lembretes"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
