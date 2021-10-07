@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_lembrete/bill/repository.dart';
-import 'package:flutter_lembrete/bill/model/bill.dart';
-import 'package:flutter_lembrete/widget/bill/list.dart';
+import 'package:flutter_lembrete/src/repository/bill_repository.dart';
+import 'package:flutter_lembrete/src/model/bill.dart';
+import 'package:flutter_lembrete/src/widget/bill/list.dart';
 
 final BillRepository repository = BillRepository();
 
 class HomeScreen extends StatefulWidget {
-  final int refresh;
-  const HomeScreen(this.refresh, {Key? key}) : super(key: key);
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int refreshList = 0;
   int currentView = 0;
 
   Widget _actionButton() {
@@ -27,6 +25,9 @@ class _HomeScreenState extends State<HomeScreen> {
       child: const Icon(Icons.add),
       onPressed: () async {
         await Navigator.pushNamed(context, '/bill');
+        setState(() {
+
+        });
       },
     );
   }
@@ -90,7 +91,6 @@ class tabList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-        padding: EdgeInsets.only(bottom: 20.0),
         child: FutureBuilder<List<BillModel>>(
             future: repository.getAll(),
             builder: (context, AsyncSnapshot<List<BillModel>> snapshot) {

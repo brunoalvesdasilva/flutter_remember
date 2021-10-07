@@ -1,30 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_lembrete/bill/model/bill.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_masked_text/flutter_masked_text.dart';
+import 'package:flutter_lembrete/src/model/bill.dart';
 
 class FormBill extends StatefulWidget {
   final Function onSave;
+  final BillModel? bill;
 
-  const FormBill(this.onSave, {Key? key}) : super(key: key);
+  const FormBill(this.onSave, {Key? key, this.bill}) : super(key: key);
 
   @override
-  _FormBillState createState() => _FormBillState(this.onSave);
+  _FormBillState createState() => _FormBillState(onSave, bill);
 }
 
 class _FormBillState extends State<FormBill> {
-  Function onSave;
-
   static const double _spaceInputs = 20;
 
-  TextEditingController _title = TextEditingController();
-  TextEditingController _price = TextEditingController();
-  TextEditingController _expire = TextEditingController();
+  late BillModel _bill = BillModel('', 0.0, 1);
+  late String labelButton;
+  final Function onSave;
+
+  final TextEditingController _title = TextEditingController();
+  final TextEditingController _price = MoneyMaskedTextController(decimalSeparator: ',', thousandSeparator: '.');
+  final TextEditingController _expire = TextEditingController();
 
   final GlobalKey<FormState> _keyForm = GlobalKey<FormState>();
 
-  _FormBillState(this.onSave);
+  _FormBillState(this.onSave, bill) {
+    labelButton = 'Salvar lembrete';
+
+    if (bill is BillModel) {
+      _bill = bill;
+      labelButton = 'Editar lembrete';
+    }
+
+    _title.text = _bill.title;
+    _price.text = _bill.price.toStringAsFixed(2);
+    _expire.text = _bill.expire.toString();
+  }
 
   double toDouble(String raw) {
-    String text = raw.replaceAll(',', '.');
+    String text = raw.replaceAll('.', '').replaceAll(',', '.');
     return double.parse(text);
   }
 
@@ -33,13 +49,11 @@ class _FormBillState extends State<FormBill> {
       return;
     }
 
-    String title = _title.text;
-    double price = toDouble(_price.text);
-    int expire = int.parse(_expire.text);
+    _bill.title = _title.text;
+    _bill.price = toDouble(_price.text);
+    _bill.expire = int.parse(_expire.text);
 
-    BillModel bill = BillModel(title, price, expire);
-
-    onSave(bill);
+    onSave(_bill);
   }
 
   @override
@@ -95,6 +109,9 @@ class _FormBillState extends State<FormBill> {
                 child: TextFormField(
                   controller: _expire,
                   keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                  ],
                   decoration: const InputDecoration(
                     hintText: 'De 1 a 31',
                   ),
@@ -112,7 +129,7 @@ class _FormBillState extends State<FormBill> {
               ),
               ElevatedButton(
                 onPressed: save,
-                child: const Text('Salvar lembrete de conta'),
+                child: Text(labelButton),
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity,
                       40), // double.infinity is the width and 30 is the height

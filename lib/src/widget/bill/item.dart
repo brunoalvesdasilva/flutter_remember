@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_lembrete/bill/model/bill.dart';
+import 'package:flutter_lembrete/src/model/bill.dart';
 
 class Item {
   final BillModel bill;
