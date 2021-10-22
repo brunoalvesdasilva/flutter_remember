@@ -10,11 +10,13 @@ class BillRepository {
   }
 
   void update(BillModel bill) async {
-    print(bill.id());
     await collection.doc(bill.id()).update(bill.toMap());
   }
 
   void delete(BillModel bill) async {
+    print("Repo");
+    print(bill.id());
+
     await collection.doc(bill.id()).delete();
   }
 

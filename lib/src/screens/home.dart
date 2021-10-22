@@ -15,6 +15,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int currentView = 0;
 
+  reload(dynamic result) {
+    print("Resultado");
+    print(result);
+  }
+
   Widget _actionButton() {
     if (currentView != 0) {
       return const SizedBox.shrink();
@@ -24,10 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
       tooltip: 'Adicionar nova conta',
       child: const Icon(Icons.add),
       onPressed: () async {
-        await Navigator.pushNamed(context, '/bill');
-        setState(() {
-
-        });
+        Navigator.pushNamed(context, '/bill').then(reload);
       },
     );
   }
@@ -56,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
         ),
-        body: TabBarView(
+        body: const TabBarView(
           children: <Widget>[
             tabList(),
             tabConfig(),

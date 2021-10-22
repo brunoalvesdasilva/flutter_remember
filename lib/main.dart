@@ -22,8 +22,8 @@ MaterialApp app() {
     title: 'Meus lembretes de contas',
     initialRoute: '/',
     routes: {
-      '/': (_) => const HomeScreen(),
-      BillScreen.routeName: (_) => const BillScreen(),
+      '/': (context) => const HomeScreen(),
+      BillScreen.routeName: (context) => const BillScreen(),
     },
   );
 }

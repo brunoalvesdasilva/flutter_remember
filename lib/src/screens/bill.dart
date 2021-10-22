@@ -18,7 +18,8 @@ class BillScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _args = ModalRoute.of(context)!.settings.arguments as BillScreenArguments;
+    final _args =
+        ModalRoute.of(context)!.settings.arguments as BillScreenArguments;
     bool _hasBill = _args is BillScreenArguments;
     final _bill = _hasBill ? _args.bill : null;
 
@@ -29,14 +30,26 @@ class BillScreen extends StatelessWidget {
         repository.create(bill);
       }
 
-      Navigator.pop(context);
+      Navigator.pop(context, "Refresh");
+    }
+
+    void onDelete(BillModel bill) {
+      if (_hasBill) {
+        repository.delete(bill);
+      }
+
+      Navigator.pop(context, "Refresh");
     }
 
     return Scaffold(
       appBar: AppBar(
         title: Text(_hasBill ? "Editar conta" : "Adicionar nova conta"),
       ),
-      body: FormBill(onSave, bill: _bill),
+      body: FormBill(
+        bill: _bill,
+        onSave: onSave,
+        onDelete: onDelete,
+      ),
     );
   }
 }

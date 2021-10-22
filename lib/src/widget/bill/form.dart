@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_lembrete/src/widget/actions/confirm.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:flutter_lembrete/src/model/bill.dart';
 
 class FormBill extends StatefulWidget {
   final Function onSave;
+  final Function onDelete;
   final BillModel? bill;
 
-  const FormBill(this.onSave, {Key? key, this.bill}) : super(key: key);
+  const FormBill({Key? key, this.bill, required this.onSave, required this.onDelete}) : super(key: key);
 
   @override
-  _FormBillState createState() => _FormBillState(onSave, bill);
+  _FormBillState createState() => _FormBillState();
 }
 
 class _FormBillState extends State<FormBill> {
   static const double _spaceInputs = 20;
 
-  late BillModel _bill = BillModel('', 0.0, 1);
-  late String labelButton;
-  final Function onSave;
+  late BillModel _bill;
+  late String _buttonLabel;
+  bool isEdit = false;
 
   final TextEditingController _title = TextEditingController();
   final TextEditingController _price = MoneyMaskedTextController(decimalSeparator: ',', thousandSeparator: '.');
@@ -26,25 +28,12 @@ class _FormBillState extends State<FormBill> {
 
   final GlobalKey<FormState> _keyForm = GlobalKey<FormState>();
 
-  _FormBillState(this.onSave, bill) {
-    labelButton = 'Salvar lembrete';
-
-    if (bill is BillModel) {
-      _bill = bill;
-      labelButton = 'Editar lembrete';
-    }
-
-    _title.text = _bill.title;
-    _price.text = _bill.price.toStringAsFixed(2);
-    _expire.text = _bill.expire.toString();
-  }
-
   double toDouble(String raw) {
     String text = raw.replaceAll('.', '').replaceAll(',', '.');
     return double.parse(text);
   }
 
-  void save() {
+  void handleSave() {
     if (!_keyForm.currentState!.validate()) {
       return;
     }
@@ -53,7 +42,24 @@ class _FormBillState extends State<FormBill> {
     _bill.price = toDouble(_price.text);
     _bill.expire = int.parse(_expire.text);
 
-    onSave(_bill);
+    widget.onSave(_bill);
+  }
+
+  void handleDelete() {
+    widget.onDelete(_bill);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    isEdit = widget.bill is BillModel;
+    _buttonLabel = isEdit ? 'Editar lembrete' : 'Salvar lembrete';
+    _bill = isEdit ? widget.bill! : BillModel('', 0.0, 1);
+
+    _title.text = _bill.title;
+    _price.text = _bill.price.toStringAsFixed(2);
+    _expire.text = _bill.expire.toString();
   }
 
   @override
@@ -127,16 +133,29 @@ class _FormBillState extends State<FormBill> {
                   },
                 ),
               ),
-              ElevatedButton(
-                onPressed: save,
-                child: Text(labelButton),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity,
-                      40), // double.infinity is the width and 30 is the height
-                ),
-              )
+              action(),
+              delete(),
             ],
           ),
         ));
+  }
+
+  Widget action() {
+    return ElevatedButton(
+      onPressed: handleSave,
+      child: Text(_buttonLabel),
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(double.infinity,
+            40), // double.infinity is the width and 30 is the height
+      ),
+    );
+  }
+
+  Widget delete() {
+    if(isEdit) {
+      return Confirm(onConfirm: handleDelete);
+    }
+
+    return const SizedBox.shrink();
   }
 }
