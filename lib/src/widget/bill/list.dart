@@ -1,39 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_lembrete/src/model/bill.dart';
-import 'package:flutter_lembrete/src/repository/bill_repository.dart';
-import 'package:flutter_lembrete/src/screens/bill.dart';
 
 import 'item.dart';
 
-final BillRepository repository = BillRepository();
-
 class ListBill extends StatefulWidget {
-  List<Item> _items = [];
+  final Function handleEdit;
+  final Function handleToggle;
+  final Function handleAttachment;
+  final List<BillModel> bills;
 
-  ListBill(List<BillModel> bills, {Key? key}) : super(key: key) {
-    _items = bills.map((BillModel bill) => Item(bill)).toList();
-  }
+  const ListBill(
+      {required this.bills,
+      required this.handleEdit,
+      required this.handleToggle,
+      required this.handleAttachment,
+      Key? key})
+      : super(key: key);
 
   @override
-  _ListBillState createState() => _ListBillState(_items);
+  _ListBillState createState() => _ListBillState();
 }
 
 class _ListBillState extends State<ListBill> {
-  final List<Item> _items;
+  late List<Item> _items;
 
-  _ListBillState(this._items);
-
-  void togglePaid(Item item) {
-    repository.paid(item.bill, !item.bill.isPaid);
-    int index = _items.indexOf(item);
-
-    setState(() {
-      _items[index].isExpanded = false;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _items = widget.bills.map((BillModel bill) => Item(bill)).toList();
   }
 
-  void gotoEdit(BillModel bill) async {
-    await Navigator.pushNamed(context, '/bill', arguments: BillScreenArguments(bill));
+  void togglePaid(Item item) {
+    widget.handleToggle(item.bill);
+
+    setState(() {
+      int index = _items.indexOf(item);
+      _items[index].isExpanded = false;
+    });
   }
 
   Widget action(IconData icon, String text, onPressed) {
@@ -49,15 +52,25 @@ class _ListBillState extends State<ListBill> {
             )));
   }
 
-  ExpansionPanel tileBill(Item item) {
-    Widget actionPaid = item.bill.isPaid
+  Widget actionPaid(Item item) {
+    return item.bill.isPaid
         ? action(Icons.warning_sharp, 'Marcar\nnão pago', () {
             togglePaid(item);
           })
         : action(Icons.check, 'Marcar pago', () {
             togglePaid(item);
           });
+  }
 
+  Widget actionEdit(Item item) {
+    return action(Icons.edit, 'Editar', () => widget.handleEdit(item.bill));
+  }
+
+  Widget actionAttachment(Item item) {
+    return action(Icons.photo_camera, 'Comprovante', () {});
+  }
+
+  ExpansionPanel tileBill(Item item) {
     return ExpansionPanel(
       isExpanded: item.isExpanded,
       backgroundColor: item.buildBackground(),
@@ -68,31 +81,17 @@ class _ListBillState extends State<ListBill> {
           padding: const EdgeInsets.all(10.0),
           child: Row(
             children: [
-              action(Icons.edit, 'Editar', () => gotoEdit(item.bill)),
-              action(Icons.photo_camera, 'Comprovante', () {}),
-              actionPaid,
+              actionEdit(item),
+              actionAttachment(item),
+              actionPaid(item),
             ],
           )),
     );
   }
 
-  int sorting(Item current, Item previous) {
-    int diff = current.bill.expire - previous.bill.expire;
-
-    if (diff < 0) {
-      return -1;
-    }
-
-    if (diff > 0) {
-      return 1;
-    }
-
-    return 0;
-  }
-
   @override
   Widget build(BuildContext context) {
-    _items.sort(sorting);
+    _items.sort(sortingItem);
     _items.sort((c, p) => c.bill.isPaid ? 1 : 0);
 
     return ExpansionPanelList(
@@ -104,4 +103,19 @@ class _ListBillState extends State<ListBill> {
       children: _items.map<ExpansionPanel>(tileBill).toList(),
     );
   }
+}
+
+
+int sortingItem(Item current, Item previous) {
+  int diff = current.bill.expire - previous.bill.expire;
+
+  if (diff < 0) {
+    return -1;
+  }
+
+  if (diff > 0) {
+    return 1;
+  }
+
+  return 0;
 }

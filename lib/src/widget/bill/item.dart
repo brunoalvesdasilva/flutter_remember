@@ -39,6 +39,6 @@ class Item {
       return 'Vence dia $expire - Valor de: $price';
     }
 
-    return 'Vencer hoje ($expire) - Valor de: ${price}';
+    return 'Vence hoje ($expire) - Valor de: ${price}';
   }
 }
