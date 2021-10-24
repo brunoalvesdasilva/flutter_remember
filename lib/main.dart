@@ -16,7 +16,7 @@ protected(Widget screen) {
   return (BuildContext context) {
     User? user = FirebaseAuth.instance.currentUser;
 
-    if (user == null) {
+    if (user != null) {
       return screen;
     }
 
