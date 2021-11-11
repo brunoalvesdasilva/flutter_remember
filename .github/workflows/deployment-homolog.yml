@@ -11,9 +11,13 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v2
 
-      - name: Install flutter-cli
+      - name: Install dependencies
         uses: steebchen/flutter@v1.1.0
+        with:
+          args: pub get
 
-      - name: Build AppBundle Flutter
-        run: flutter build appbundle --no-sound-null-safety
+      - name: Build AppBundle
+        uses: steebchen/flutter@v1.1.0
+        with:
+          args: build appbundle --release --no-sound-null-safety
 
