@@ -1,0 +1,11 @@
+name: Deployment Homolog
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    name: Setup
+    steps:
+      - name: How Works
+        run: echo "Ithis Works"
