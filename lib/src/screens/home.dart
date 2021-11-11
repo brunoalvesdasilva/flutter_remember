@@ -1,16 +1,15 @@
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_lembrete/src/model/auth.dart';
 import 'package:flutter_lembrete/src/model/fcm.dart';
-import 'package:flutter_lembrete/src/repository/fcm_repository.dart';
 import 'package:flutter_lembrete/src/repository/bill_repository.dart';
 import 'package:flutter_lembrete/src/model/bill.dart';
+import 'package:flutter_lembrete/src/repository/user_repository.dart';
 import 'package:flutter_lembrete/src/widget/bill/list.dart';
 
 import 'bill.dart';
 
 final BillRepository repository = BillRepository();
-FcmRepository _fcmRepository = FcmRepository();
 
 FirebaseMessaging messaging = FirebaseMessaging.instance;
 
@@ -53,7 +52,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> saveTokenToDatabase(String token) async {
-    _fcmRepository.create(FcmModel(token));
+    AuthModel.instance.userModel!.addFcm(FcmModel(token));
+    UserRepository().update(AuthModel.instance.userModel!);
   }
 
   reload(dynamic result) {

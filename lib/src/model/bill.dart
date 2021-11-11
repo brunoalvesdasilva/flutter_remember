@@ -7,10 +7,11 @@ class BillModel extends BaseModel {
   late int expire;
 
   String? _id;
+  String? referenceId;
   late DateTime date;
   late bool isPaid;
 
-  BillModel(this.title, this.price, this.expire, {isPaid, id, date}) {
+  BillModel(this.title, this.price, this.expire, {isPaid, id, date, this.referenceId}) {
     _id = id ?? '';
     this.isPaid = isPaid ?? false;
     this.date = date ?? DateTime.now();
@@ -21,18 +22,20 @@ class BillModel extends BaseModel {
 
     Map<String, dynamic> data = document.data() as Map<String, dynamic>;
 
+    String referenceId = data['referenceId'];
     String title = data['title'];
     double price = data['price'];
     int expire = data['expire'];
     bool isPaid = data['isPaid'];
     DateTime date = DateTime.parse(data['date']);
 
-    return BillModel(title, price, expire, isPaid: isPaid, id: id, date: date);
+    return BillModel(title, price, expire, isPaid: isPaid, id: id, date: date, referenceId: referenceId);
   }
 
   @override
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
+      'referenceId': referenceId,
       'title': title,
       'price': price,
       'expire': expire,
