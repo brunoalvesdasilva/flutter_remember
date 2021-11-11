@@ -6,6 +6,14 @@ on:
 jobs:
   setup:
     name: Setup
+    runs-on: ubuntu-latest
     steps:
-      - name: How Works
-        run: echo "Ithis Works"
+      - name: Checkout project
+        uses: actions/checkout@v2
+
+      - name: Install flutter-cli
+        uses: steebchen/flutter@v1.1.0
+
+      - name: Build AppBundle Flutter
+        run: flutter build appbundle --no-sound-null-safety
+
