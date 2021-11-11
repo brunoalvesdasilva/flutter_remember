@@ -71,3 +71,8 @@ DerivedData
 # Keys
 GoogleService-Info.plist
 google-services.json
+key-publish.json
+
+# Fastlane
+fastlane/report.xml
+android/vendor

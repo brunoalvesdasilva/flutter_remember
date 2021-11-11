@@ -12,6 +12,15 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v2
 
+      - name: Checkout Google Json
+        run: |
+          versionFile='android/app/google-services.json'
+          gist_url='https://gist.githubusercontent.com/brunoalvesdasilva/'
+          gist_id='68991eac6ef645a353139aadb04a64f2'
+          gist_rawfile='/raw'
+          gist_raw_endpoint=$gist_url$gist_id$gist_rawfile
+          curl -s "${gist_raw_endpoint}" -o "${versionFile}"
+
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
