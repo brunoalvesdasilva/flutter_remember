@@ -1,15 +1,26 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_lembrete/src/screens/auth.dart';
 import 'package:flutter_lembrete/src/screens/bill.dart';
 import 'package:flutter_lembrete/src/screens/home.dart';
+import 'package:flutter_lembrete/src/utils/log.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
 
-  runApp(app());
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+
+    log('init app');
+
+    runApp(app());
+  }, (error, stackTrace) {
+    FirebaseCrashlytics.instance.recordError(error, stackTrace);
+  });
 }
 
 protected(Widget screen) {
