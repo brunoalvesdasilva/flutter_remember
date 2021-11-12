@@ -24,7 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int currentView = 0;
 
   requestPermissionNotification() async {
-    NotificationSettings settings = await messaging.requestPermission(
+    // NotificationSettings settings =
+    await messaging.requestPermission(
       alert: true,
       announcement: false,
       badge: true,
@@ -34,13 +35,13 @@ class _HomeScreenState extends State<HomeScreen> {
       sound: true,
     );
 
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    /*if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       print('User granted permission');
     } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
       print('User granted provisional permission');
     } else {
       print('User declined or has not accepted permission');
-    }
+    }*/
   }
 
   requestToken() async {

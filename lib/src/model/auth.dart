@@ -12,11 +12,13 @@ class AuthModel {
 
   AuthModel._privateConstructor();
 
-  void auth(UserModel authUser) {
+  Future<bool> auth(UserModel authUser) async {
     user = FirebaseAuth.instance.currentUser;
     userModel = authUser;
 
     lastAuth = DateTime.now();
+
+    return isAuth();
   }
 
   Future tryAuth() async {
@@ -38,7 +40,7 @@ class AuthModel {
     return userModel != null && user != null;
   }
 
-  register(User user) async {
+  Future<bool> register(User user) async {
     String name = user.displayName!;
     String email = user.email!;
     String id = user.uid;
@@ -49,12 +51,14 @@ class AuthModel {
     UserRepository userRepository = UserRepository();
     userModel = await userRepository.register(userModel);
 
-    auth(userModel);
+    return auth(userModel);
   }
 
-  void logout() {
+  bool logout() {
     user = null;
     userModel = null;
     lastAuth = null;
+
+    return !isAuth();
   }
 }

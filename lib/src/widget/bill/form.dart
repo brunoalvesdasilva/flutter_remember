@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_lembrete/src/widget/actions/confirm.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:flutter_lembrete/src/model/bill.dart';
 
@@ -65,7 +66,7 @@ class _FormBillState extends State<FormBill> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         child: Form(
           key: _keyForm,
           child: Column(

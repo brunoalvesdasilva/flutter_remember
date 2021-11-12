@@ -7,7 +7,6 @@ class FcmModel {
 
   String id() => _id;
 
-  @override
   Map<String, dynamic> toMap() {
     String operatingSystem = Platform.operatingSystem;
     String operatingSystemVersion = Platform.operatingSystemVersion;

@@ -3,8 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_lembrete/src/model/auth.dart';
-import 'package:flutter_lembrete/src/model/user.dart';
-import 'package:flutter_lembrete/src/repository/user_repository.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:google_sign_in/google_sign_in.dart';
 
 GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -23,6 +22,34 @@ Future<UserCredential> signInWithGoogle() async {
   return await FirebaseAuth.instance.signInWithCredential(credential);
 }
 
+showAlertDialog(BuildContext context, String message) {
+
+  // set up the button
+  Widget okButton = ElevatedButton(
+    child: const Text("Tentar novamente"),
+    onPressed: () {
+      Navigator.of(context).pop();
+    },
+  );
+
+  // set up the AlertDialog
+  AlertDialog alert = AlertDialog(
+    title: const Text("Atenção"),
+    content: Text(message),
+    actions: [
+      okButton,
+    ],
+  );
+
+  // show the dialog
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
+}
+
 class AuthScreen extends StatefulWidget {
   const AuthScreen({Key? key}) : super(key: key);
 
@@ -31,18 +58,30 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  FutureOr<dynamic> refresh(UserCredential userCredential) {
+  bool isFetch = false;
+
+  Future<FutureOr> refresh(UserCredential userCredential) async {
+    isFetch = false;
     User? user = userCredential.user;
 
     if (user != null) {
-      AuthModel.instance.register(user);
+      await AuthModel.instance.register(user);
 
-      Navigator.pushReplacementNamed(context, '/');
+      if (AuthModel.instance.isAuth()) {
+        Navigator.pushReplacementNamed(context, '/');
+        setState(() => {});
+        return true;
+      }
     }
+
+    setState(() => showAlertDialog(context, 'Não foi possível autenticar o usuário'));
+    return false;
   }
 
   void auth() {
-    signInWithGoogle().then(refresh);
+    isFetch = true;
+
+    setState(() => signInWithGoogle().then(refresh));
   }
 
   @override
@@ -55,16 +94,20 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Widget body() {
-    return Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(children: [heroText(), buttonAuth()]));
+    return Column(children: [loading(), heroText(), buttonAuth()]);
+  }
+
+  Widget loading() {
+    return Container(child: isFetch ? const LinearProgressIndicator() : null);
   }
 
   Widget heroText() {
-    return const Center(
+    return const Padding(
+        padding: EdgeInsets.all(20.0),
+        child: Center(
       child: Text('Lembrete de contas',
           style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-    );
+    ));
   }
 
   Widget buttonAuth() {
