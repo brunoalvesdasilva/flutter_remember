@@ -1,8 +1,8 @@
 name: Deployment Homolog
 
 on:
-  # workflow_dispatch:
-  - push
+  workflow_dispatch:
+  #- push
 
 jobs:
   setup:
@@ -36,4 +36,14 @@ jobs:
 
       - name: Build AppBundle
         run: flutter build appbundle --release --no-sound-null-safety
+
+      - name: Install gem
+        run: |
+          sudo gem install bundler
+          bundle config set path vendor/bundle
+          bundle check || bundle install
+
+      - name: Checkversion fastlane
+        run: |
+          bundle exec fastlane deploy
 

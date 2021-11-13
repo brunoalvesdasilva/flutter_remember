@@ -75,4 +75,4 @@ key-publish.json
 
 # Fastlane
 fastlane/report.xml
-android/vendor
+vendor/
