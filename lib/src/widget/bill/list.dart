@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lembrete/src/model/bill.dart';
 
@@ -5,6 +6,7 @@ import 'item.dart';
 
 class ListBill extends StatefulWidget {
   final Function handleEdit;
+  final Function handleDelete;
   final Function handleToggle;
   final Function handleAttachment;
   final List<BillModel> bills;
@@ -12,6 +14,7 @@ class ListBill extends StatefulWidget {
   const ListBill(
       {required this.bills,
       required this.handleEdit,
+      required this.handleDelete,
       required this.handleToggle,
       required this.handleAttachment,
       Key? key})
@@ -70,13 +73,28 @@ class _ListBillState extends State<ListBill> {
     return action(Icons.photo_camera, 'Comprovante', () {});
   }
 
+  @override
+  Widget build(BuildContext context) {
+    _items.sort(sortingItem);
+    _items.sort((c, p) => c.bill.isPaid ? 1 : 0);
+
+    return ExpansionPanelList(
+      expansionCallback: (int index, bool isExpanded) {
+        setState(() {
+          _items[index].isExpanded = !isExpanded;
+        });
+      },
+      children: _items.map<ExpansionPanel>(tileBill).toList()
+    );
+  }
+
   ExpansionPanel tileBill(Item item) {
+    Color background = item.bill.isPaid ? Colors.white.withOpacity(0.80) : Colors.white;
+
     return ExpansionPanel(
       isExpanded: item.isExpanded,
-      backgroundColor: item.buildBackground(),
-      headerBuilder: (BuildContext context, bool isExpanded) {
-        return item.buildTile();
-      },
+      backgroundColor: background,
+      headerBuilder: (BuildContext context, bool isExpanded) => buildTile(item.bill),
       body: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Row(
@@ -89,19 +107,70 @@ class _ListBillState extends State<ListBill> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    _items.sort(sortingItem);
-    _items.sort((c, p) => c.bill.isPaid ? 1 : 0);
+  Widget buildTile(BillModel bill) {
+    TextDecoration _style =
+    bill.isPaid ? TextDecoration.lineThrough : TextDecoration.none;
+    NumberFormat numberFormat = NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
+    String expire = bill.expire.toString();
+    String price = numberFormat.format(bill.price);
+    int statusExpired = bill.statusExpired();
+    String subtitle = 'Vence hoje ($expire) - Valor de: $price';
 
-    return ExpansionPanelList(
-      expansionCallback: (int index, bool isExpanded) {
-        setState(() {
-          _items[index].isExpanded = !isExpanded;
-        });
-      },
-      children: _items.map<ExpansionPanel>(tileBill).toList(),
-    );
+    if (statusExpired == -1) {
+      subtitle = 'Venceu dia $expire - Valor de: $price';
+    }
+
+    if (statusExpired == 1) {
+      subtitle = 'Vence dia $expire - Valor de: $price';
+    }
+
+    return Dismissible(
+        key: ValueKey<String>(bill.id()),
+        direction: DismissDirection.startToEnd,
+        onDismissed: (DismissDirection direction) {
+            setState(() {
+              _items.removeWhere((element) => element.bill.id() == bill.id());
+              widget.handleDelete(bill);
+            });
+        },
+        confirmDismiss: (DismissDirection direction) async {
+          return await showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Deletar lembrete?"),
+                content: const Text("Essa ação não pode ser desfeita!"),
+                actions: <Widget>[
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(primary: Colors.redAccent),
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text("Sim, deletar")
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(primary: Colors.grey),
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text("Cancelar"),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        background: Container(
+          alignment: AlignmentDirectional.centerStart,
+          color: Colors.red,
+          child: const Padding(
+            padding: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
+            child: Icon(
+              Icons.delete,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        child: ListTile(
+          title: Text(bill.title, style: TextStyle(decoration: _style)),
+          subtitle: Text(subtitle),
+        ));
   }
 }
 

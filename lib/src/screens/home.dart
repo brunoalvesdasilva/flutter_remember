@@ -48,7 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
     String? token = await FirebaseMessaging.instance.getToken();
 
     await saveTokenToDatabase(token!);
-
     FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDatabase);
   }
 
@@ -58,10 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   reload(dynamic result) {
-    if (result is String) {
-      if (result == 'Refresh') {
-        setState(() {});
-      }
+    if (result is String && result == 'Refresh') {
+      setState(() {});
     }
   }
 
@@ -76,6 +73,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   handleToggle(BillModel bill) {
     repository.paid(bill, !bill.isPaid);
+  }
+
+  handleDelete(BillModel bill) {
+    repository.delete(bill);
   }
 
   handleAttachment(BillModel bill) {}
@@ -125,18 +126,13 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
         ),
-        body: TabBarView(
-          children: <Widget>[
-            tabList(),
-            tabConfig(),
-          ],
-        ),
+        body: currentView == 0 ? listBills() : tabConfig(),
         floatingActionButton: _actionButton(),
       ),
     );
   }
 
-  Widget tabList() {
+  Widget listBills() {
     return SingleChildScrollView(
         child: FutureBuilder<List<BillModel>>(
             future: repository.getAll(),
@@ -149,6 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 bills: snapshot.data ?? [],
                 handleToggle: handleToggle,
                 handleAttachment: handleAttachment,
+                handleDelete: handleDelete,
                 handleEdit: handleEdit,
               );
             }));

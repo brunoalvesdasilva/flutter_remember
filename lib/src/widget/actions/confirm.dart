@@ -19,6 +19,9 @@ class _ConfirmState extends State<Confirm> {
   }
 
   handleCancel() {
+    setState(() {
+      isConfirm = false;
+    });
   }
 
   handleOnConfirm() {

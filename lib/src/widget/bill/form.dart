@@ -99,11 +99,7 @@ class _FormBillState extends State<FormBill> {
                   ),
                   validator: (text) {
                     try {
-                      double value = toDouble(text!);
-
-                      if (!(value >= 0.01)) {
-                        return 'Digite um valor maior que zero!';
-                      }
+                      toDouble(text!);
                     } catch (e) {
                       return 'Precisamos saber uma previsão de valor';
                     }
@@ -135,7 +131,7 @@ class _FormBillState extends State<FormBill> {
                 ),
               ),
               action(),
-              delete(),
+              // delete(),
             ],
           ),
         ));

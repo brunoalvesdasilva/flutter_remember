@@ -80,7 +80,6 @@ class _AuthScreenState extends State<AuthScreen> {
 
   void auth() {
     isFetch = true;
-
     setState(() => signInWithGoogle().then(refresh));
   }
 
@@ -114,8 +113,8 @@ class _AuthScreenState extends State<AuthScreen> {
     return Expanded(
         child: Center(
             child: ElevatedButton(
-      onPressed: auth,
-      child: const Text('Logar com uma conta Google'),
+      onPressed: isFetch ? null : auth,
+      child: Text(isFetch ? 'Aguarde...': 'Logar com uma conta Google'),
     )));
   }
 }
