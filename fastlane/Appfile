@@ -1,2 +1,0 @@
-json_key_file("android/app/key-publish.json")
-package_name("br.com.sistemasamo.lembretes")

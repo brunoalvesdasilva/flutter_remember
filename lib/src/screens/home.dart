@@ -126,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
         ),
-        body: currentView == 0 ? listBills() : tabConfig(),
+        body: listBills(),
         floatingActionButton: _actionButton(),
       ),
     );

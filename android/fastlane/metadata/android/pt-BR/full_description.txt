@@ -1,0 +1,7 @@
+Contas são coisas que não deveriam estar na sua cabeça. O app lembrete de contas é uma ferramenta que cria um relatório de todas as suas contas e através de poucas configurações te avisa no tempo determinado as suas contas que estão prestes a vencer.
+
+- Configure contas para ser lembrado;
+- Receba relatórios por alertas, no app, no e-mail e no site;
+- Anexe comprovante de pagamentos;
+- Avise outras pessoas que as contas estão vencendo;
+- Tenha um relatório financeiro mensal de todas as suas contas.
