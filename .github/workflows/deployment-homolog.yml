@@ -43,7 +43,7 @@ jobs:
           bundle config set path vendor/bundle
           bundle check || bundle install
 
-      - name: Checkversion fastlane
+      - name: Upload appbundle to store
         run: |
-          bundle exec fastlane deploy
+          cd android && bundle exec fastlane deploy
 

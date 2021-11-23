@@ -1,0 +1,3 @@
+Nessa nova versão, otimizamos algumas telas para trazer mais velocidade.
+
+Agora ficou mais fácil deletar uma conta, apenas arraste ela para a direita e confime!

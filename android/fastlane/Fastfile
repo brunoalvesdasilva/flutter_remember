@@ -23,7 +23,6 @@ platform :android do
 
   desc "Submit a new Beta Build to Crashlytics Beta"
   lane :beta do
-    gradle(task: "clean assembleRelease")
     crashlytics
   
     # sh "your_script.sh"
@@ -32,7 +31,9 @@ platform :android do
 
   desc "Deploy a new version to the Google Play"
   lane :deploy do
-    gradle(task: "clean assembleRelease")
-    upload_to_play_store
+    upload_to_play_store(
+      aab: "../build/app/outputs/bundle/release/app-release.aab",
+      version_code: 10
+    )
   end
 end
