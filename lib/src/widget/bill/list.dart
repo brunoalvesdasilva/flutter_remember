@@ -70,7 +70,7 @@ class _ListBillState extends State<ListBill> {
   }
 
   Widget actionAttachment(Item item) {
-    return action(Icons.photo_camera, 'Comprovante', () {});
+    return action(Icons.photo_camera, 'Comprovante', () => widget.handleAttachment(item.bill));
   }
 
   @override

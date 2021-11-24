@@ -1,11 +1,18 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_lembrete/src/client/google_auth_client.dart';
 import 'package:flutter_lembrete/src/model/auth.dart';
 import 'package:flutter_lembrete/src/model/fcm.dart';
 import 'package:flutter_lembrete/src/repository/bill_repository.dart';
 import 'package:flutter_lembrete/src/model/bill.dart';
 import 'package:flutter_lembrete/src/repository/user_repository.dart';
 import 'package:flutter_lembrete/src/widget/bill/list.dart';
+import 'package:googleapis/drive/v3.dart' as drive;
+import 'package:google_sign_in/google_sign_in.dart' as signIn;
 
 import 'bill.dart';
 
@@ -79,7 +86,39 @@ class _HomeScreenState extends State<HomeScreen> {
     repository.delete(bill);
   }
 
-  handleAttachment(BillModel bill) {}
+  handleAttachment(BillModel bill) async {
+
+    final googleSignIn =
+    signIn.GoogleSignIn.standard(scopes: [drive.DriveApi.driveScope]);
+    final signIn.GoogleSignInAccount account = await googleSignIn.signIn();
+
+    print("User account $account");
+    final authHeaders = await account.authHeaders;
+    final authenticateClient = GoogleAuthClient(authHeaders);
+    final driveApi = drive.DriveApi(authenticateClient);
+
+    FilePickerResult? fileLocal = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'png', 'pdf'],
+    );
+
+    if (fileLocal != null) {
+      PlatformFile fileSelected = fileLocal.files.first;
+
+      File file = File(fileSelected.path!);
+
+      var driveFolder = drive.File();
+      driveFolder.name = "Lembrete_de_contas";
+      driveFolder.mimeType = "application/vnd.google-apps.folder";
+      await driveApi.files.create(driveFolder);
+
+      var driveFile = drive.File();
+      //driveFile.parents = ['Lembrete_de_contas'];
+      driveFile.name = "hello_world.${fileSelected.extension}";
+      final result = await driveApi.files.create(driveFile, uploadMedia: drive.Media(file.openRead(), file.lengthSync()));
+      print("Upload result: $result");
+    }
+  }
 
   @override
   void initState() {

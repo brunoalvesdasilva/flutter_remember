@@ -6,7 +6,10 @@ import 'package:flutter_lembrete/src/model/auth.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:google_sign_in/google_sign_in.dart';
 
-GoogleSignIn _googleSignIn = GoogleSignIn();
+GoogleSignIn _googleSignIn = GoogleSignIn(scopes: [
+  'email',
+  'https://www.googleapis.com/auth/drive',
+]);
 
 Future<UserCredential> signInWithGoogle() async {
   final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
