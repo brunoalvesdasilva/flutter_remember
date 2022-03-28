@@ -87,13 +87,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   handleAttachment(BillModel bill) async {
-
     final googleSignIn =
-    signIn.GoogleSignIn.standard(scopes: [drive.DriveApi.driveScope]);
-    final signIn.GoogleSignInAccount account = await googleSignIn.signIn();
+        signIn.GoogleSignIn.standard(scopes: [drive.DriveApi.driveScope]);
 
-    print("User account $account");
-    final authHeaders = await account.authHeaders;
+    late Map<String, String> authHeaders;
+    late String idFolder;
+
+    if (googleSignIn.currentUser != null) {
+      authHeaders = googleSignIn.currentUser.authHeaders as Map<String, String>;
+    } else {
+      final signIn.GoogleSignInAccount account = await googleSignIn.signIn();
+      authHeaders = await account.authHeaders;
+    }
+
     final authenticateClient = GoogleAuthClient(authHeaders);
     final driveApi = drive.DriveApi(authenticateClient);
 
@@ -107,16 +113,33 @@ class _HomeScreenState extends State<HomeScreen> {
 
       File file = File(fileSelected.path!);
 
-      var driveFolder = drive.File();
-      driveFolder.name = "Lembrete_de_contas";
-      driveFolder.mimeType = "application/vnd.google-apps.folder";
-      await driveApi.files.create(driveFolder);
+      var resultSearch = await driveApi.files.list(
+          q: "name = 'Lembrete_de_contas' and mimeType='application/vnd.google-apps.folder' and trashed = false");
+
+      if (resultSearch.files!.isEmpty) {
+        var driveFolder = drive.File();
+        driveFolder.name = "Lembrete_de_contas";
+        driveFolder.mimeType = "application/vnd.google-apps.folder";
+        var resultFolder = await driveApi.files.create(driveFolder);
+        idFolder = resultFolder.id!;
+      } else {
+        idFolder = resultSearch.files!.first.id!;
+      }
 
       var driveFile = drive.File();
-      //driveFile.parents = ['Lembrete_de_contas'];
-      driveFile.name = "hello_world.${fileSelected.extension}";
-      final result = await driveApi.files.create(driveFile, uploadMedia: drive.Media(file.openRead(), file.lengthSync()));
-      print("Upload result: $result");
+      driveFile.parents = [idFolder];
+      driveFile.name = "${bill.id()}.${fileSelected.extension}";
+
+      var searchFile = await driveApi.files.list(
+          q: "name = '${bill.id()}.${fileSelected.extension}' and trashed = false");
+
+      if (searchFile.files!.isNotEmpty) {
+        String idFile = searchFile.files!.first.id!;
+        await driveApi.files.delete(idFile);
+      }
+
+      await driveApi.files.create(driveFile,
+          uploadMedia: drive.Media(file.openRead(), file.lengthSync()));
     }
   }
 
@@ -140,7 +163,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     requestPermissionNotification();
 
     return DefaultTabController(

@@ -70,7 +70,8 @@ class _ListBillState extends State<ListBill> {
   }
 
   Widget actionAttachment(Item item) {
-    return action(Icons.photo_camera, 'Comprovante', () => widget.handleAttachment(item.bill));
+    return action(Icons.photo_camera, 'Comprovante',
+        () => widget.handleAttachment(item.bill));
   }
 
   @override
@@ -79,28 +80,29 @@ class _ListBillState extends State<ListBill> {
     _items.sort((c, p) => c.bill.isPaid ? 1 : 0);
 
     return ExpansionPanelList(
-      expansionCallback: (int index, bool isExpanded) {
-        setState(() {
-          _items[index].isExpanded = !isExpanded;
-        });
-      },
-      children: _items.map<ExpansionPanel>(tileBill).toList()
-    );
+        expansionCallback: (int index, bool isExpanded) {
+          setState(() {
+            _items[index].isExpanded = !isExpanded;
+          });
+        },
+        children: _items.map<ExpansionPanel>(tileBill).toList());
   }
 
   ExpansionPanel tileBill(Item item) {
-    Color background = item.bill.isPaid ? Colors.white.withOpacity(0.80) : Colors.white;
+    Color background =
+        item.bill.isPaid ? Colors.white.withOpacity(0.80) : Colors.white;
 
     return ExpansionPanel(
       isExpanded: item.isExpanded,
       backgroundColor: background,
-      headerBuilder: (BuildContext context, bool isExpanded) => buildTile(item.bill),
+      headerBuilder: (BuildContext context, bool isExpanded) =>
+          buildTile(item.bill),
       body: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Row(
             children: [
               actionEdit(item),
-              actionAttachment(item),
+              // actionAttachment(item),
               actionPaid(item),
             ],
           )),
@@ -109,8 +111,9 @@ class _ListBillState extends State<ListBill> {
 
   Widget buildTile(BillModel bill) {
     TextDecoration _style =
-    bill.isPaid ? TextDecoration.lineThrough : TextDecoration.none;
-    NumberFormat numberFormat = NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
+        bill.isPaid ? TextDecoration.lineThrough : TextDecoration.none;
+    NumberFormat numberFormat =
+        NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
     String expire = bill.expire.toString();
     String price = numberFormat.format(bill.price);
     int statusExpired = bill.statusExpired();
@@ -128,10 +131,10 @@ class _ListBillState extends State<ListBill> {
         key: ValueKey<String>(bill.id()),
         direction: DismissDirection.startToEnd,
         onDismissed: (DismissDirection direction) {
-            setState(() {
-              _items.removeWhere((element) => element.bill.id() == bill.id());
-              widget.handleDelete(bill);
-            });
+          setState(() {
+            _items.removeWhere((element) => element.bill.id() == bill.id());
+            widget.handleDelete(bill);
+          });
         },
         confirmDismiss: (DismissDirection direction) async {
           return await showDialog(
@@ -142,10 +145,10 @@ class _ListBillState extends State<ListBill> {
                 content: const Text("Essa ação não pode ser desfeita!"),
                 actions: <Widget>[
                   ElevatedButton(
-                      style: ElevatedButton.styleFrom(primary: Colors.redAccent),
+                      style:
+                          ElevatedButton.styleFrom(primary: Colors.redAccent),
                       onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text("Sim, deletar")
-                  ),
+                      child: const Text("Sim, deletar")),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(primary: Colors.grey),
                     onPressed: () => Navigator.of(context).pop(false),
@@ -173,7 +176,6 @@ class _ListBillState extends State<ListBill> {
         ));
   }
 }
-
 
 int sortingItem(Item current, Item previous) {
   int diff = current.bill.expire - previous.bill.expire;
